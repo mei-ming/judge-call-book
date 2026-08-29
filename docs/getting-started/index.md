@@ -3,19 +3,26 @@ title: 快速開始總覽
 order: 10
 ---
 
-# 快速開始總覽
+# 什麼是 EOR
 
-歡迎使用 **Judge Call Book** 教學手冊！本教學手冊旨在幫助您快速掌握系統的各項核心功能與操作指引。
+End of Round
 
-## 本章節內容
+每輪結束為確保比賽進度
 
-- [登入教學](/getting-started/login)：了解如何安全登入系統與進行基本個人設定。
-- [功能介紹](/features/)：探索各項進階功能與資料同步機制。
+時間到後確認未完成桌次
 
-## 維護原則簡介
+並且注意玩家的遊戲節奏
 
-本系統採用以 Markdown 為唯一維護介面的設計模式：
 
-1. **文字說明**：使用 Markdown 撰寫核心概念與功能介紹。
-2. **操作步驟**：嵌入 Scribe 逐步教學或靜態圖解。
-3. **動態展示**：使用 Animated WebP 或 MP4 影片展示實際操作流程。
+## EOR 簡易流程
+
+1. 剩餘約 10 分鐘時過去找到 EOR，EOR 會分派桌次範圍，記錄未完成桌次並回報。
+
+2. 剩餘約 5 分鐘時過去找 EOR。EOR 會指派桌次過去盯桌，都結束後找 EOR 回報並且等待下批盯桌桌次。
+
+3. 一直重複 2，直到所有桌次都結束。
+
+> ERO 需要保留人力處理 Judge Call
+
+<video controls playsinline preload="metadata" style="width: 100%; border-radius: 8px;" src="/media/videos/seat-inspection-full-v2.webm"></video>
+

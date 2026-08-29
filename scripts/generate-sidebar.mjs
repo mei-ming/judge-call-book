@@ -11,7 +11,9 @@ const SECTION_TITLES = {
   'features': '功能介紹',
   'troubleshooting': '疑難排解',
   'guide': '使用指南',
-  'faq': '常見問答'
+  'faq': '常見問答',
+  'tables': '桌次管理',
+  'penalties': '罰則系統'
 };
 
 /**
@@ -74,16 +76,25 @@ export function generateSidebar() {
   }
 
   const mdFiles = scanDocs(DOCS_ROOT);
-  const sections = {};
+  
+  // Structure: { [sectionKey]: { rootItems: [], subGroups: { [subKey]: { title, order, collapsed, items: [] } } } }
+  const sectionData = {};
 
   for (const filePath of mdFiles) {
     const relativePath = path.relative(DOCS_ROOT, filePath);
     const normalizedRelPath = relativePath.split(path.sep).join('/');
     const pathParts = normalizedRelPath.split('/');
 
-    // Top-level section folder
-    const sectionDir = pathParts.length > 1 ? pathParts[0] : '';
-    if (!sectionDir) continue;
+    // Top-level section folder (e.g. 'features', 'getting-started')
+    const sectionKey = pathParts[0];
+    if (!sectionKey) continue;
+
+    if (!sectionData[sectionKey]) {
+      sectionData[sectionKey] = {
+        rootItems: [],
+        subGroups: {}
+      };
+    }
 
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const { data: frontmatter, content } = matter(fileContent);
@@ -99,48 +110,106 @@ export function generateSidebar() {
     // Construct VitePress link (without .md, index becomes '/')
     let linkPath = '/' + normalizedRelPath.replace(/\.md$/, '');
     if (linkPath.endsWith('/index')) {
-      linkPath = linkPath.slice(0, -5); // e.g. /getting-started/
+      linkPath = linkPath.slice(0, -5); // e.g. /features/tables/
     }
 
-    if (!sections[sectionDir]) {
-      sections[sectionDir] = [];
-    }
-
-    sections[sectionDir].push({
+    const itemObj = {
       text: title,
       link: linkPath,
       order: order,
       filename: path.basename(filePath)
-    });
+    };
+
+    // Check if file is in a sub-directory or has explicit frontmatter group
+    if (frontmatter.group) {
+      const groupKey = frontmatter.group;
+      if (!sectionData[sectionKey].subGroups[groupKey]) {
+        sectionData[sectionKey].subGroups[groupKey] = {
+          title: groupKey,
+          order: typeof frontmatter.group_order === 'number' ? frontmatter.group_order : 9999,
+          collapsed: frontmatter.collapsed !== undefined ? frontmatter.collapsed : false,
+          items: []
+        };
+      }
+      sectionData[sectionKey].subGroups[groupKey].items.push(itemObj);
+    } else if (pathParts.length > 2) {
+      // It's in a subdirectory: docs/<section>/<subDir>/...
+      const subDir = pathParts[1];
+      if (!sectionData[sectionKey].subGroups[subDir]) {
+        // Find default title from SECTION_TITLES or format
+        const defaultTitle = SECTION_TITLES[subDir] || formatTitle(subDir);
+        sectionData[sectionKey].subGroups[subDir] = {
+          title: defaultTitle,
+          order: 9999,
+          collapsed: false,
+          items: []
+        };
+      }
+
+      // If this file is index.md of the subDir, it can set the group's title and order
+      if (pathParts.length === 3 && pathParts[2] === 'index.md') {
+        if (frontmatter.title) {
+          sectionData[sectionKey].subGroups[subDir].title = frontmatter.title;
+        }
+        if (typeof frontmatter.order === 'number') {
+          sectionData[sectionKey].subGroups[subDir].order = frontmatter.order;
+        }
+        if (frontmatter.collapsed !== undefined) {
+          sectionData[sectionKey].subGroups[subDir].collapsed = frontmatter.collapsed;
+        }
+      }
+
+      sectionData[sectionKey].subGroups[subDir].items.push(itemObj);
+    } else {
+      // Top-level item within this section
+      sectionData[sectionKey].rootItems.push(itemObj);
+    }
   }
 
   // Sort and build final sidebar object
   const sidebar = {};
 
-  for (const [sectionKey, items] of Object.entries(sections)) {
-    // Sort items: by order ascending, then by filename
-    items.sort((a, b) => {
-      if (a.order !== b.order) {
-        return a.order - b.order;
-      }
-      // If one is index, put it first
+  for (const [sectionKey, data] of Object.entries(sectionData)) {
+    const sectionSidebar = [];
+
+    // 1. Sort root items
+    data.rootItems.sort((a, b) => {
+      if (a.order !== b.order) return a.order - b.order;
       if (a.filename === 'index.md') return -1;
       if (b.filename === 'index.md') return 1;
       return a.filename.localeCompare(b.filename);
     });
 
-    const cleanItems = items.map(({ text, link }) => ({ text, link }));
-    const sectionTitle = SECTION_TITLES[sectionKey] || formatTitle(sectionKey);
+    // 2. Sort sub-groups
+    const sortedSubGroups = Object.entries(data.subGroups).map(([key, group]) => {
+      // Sort items within subgroup
+      group.items.sort((a, b) => {
+        if (a.order !== b.order) return a.order - b.order;
+        if (a.filename === 'index.md') return -1;
+        if (b.filename === 'index.md') return 1;
+        return a.filename.localeCompare(b.filename);
+      });
+      return { key, ...group };
+    });
 
-    const sectionConfig = [
-      {
-        text: sectionTitle,
-        collapsed: false,
-        items: cleanItems
-      }
-    ];
+    sortedSubGroups.sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
 
-    sidebar[`/${sectionKey}/`] = sectionConfig;
+    // If there are sub-groups, construct multi-group / nested structure
+    // 1. Direct root items (e.g. 快速開始總覽、功能總覽) at top level
+    for (const item of data.rootItems) {
+      sectionSidebar.push({ text: item.text, link: item.link });
+    }
+
+    // 2. Collapsible sub-groups (only created when subdirectories or groups exist)
+    for (const group of sortedSubGroups) {
+      sectionSidebar.push({
+        text: group.title,
+        collapsed: group.collapsed,
+        items: group.items.map(({ text, link }) => ({ text, link }))
+      });
+    }
+
+    sidebar[`/${sectionKey}/`] = sectionSidebar;
   }
 
   // Ensure directory exists

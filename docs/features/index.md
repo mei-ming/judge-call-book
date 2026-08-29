@@ -9,8 +9,8 @@ order: 10
 
 ## 核心功能清單
 
-- **[資料同步](/features/synchronization)**：跨系統同步審查紀錄與即時通訊狀態。
-- **[範例功能](/features/example-feature)**：展示進階功能模組與相關配置。
+- **[桌次管理](/features/tables/)**：桌次狀態同步與進度追蹤。
+- **[罰則系統](/features/penalties/)**：裁判罰則記錄與查詢。
 
 ## 媒體使用規範
 
