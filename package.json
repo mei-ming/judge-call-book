@@ -1,0 +1,24 @@
+{
+  "name": "judge-call-book",
+  "version": "1.0.0",
+  "description": "Web APP 教學網站",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "npm run docs:sidebar && vitepress dev docs",
+    "docs:sidebar": "node scripts/generate-sidebar.mjs",
+    "docs:build": "npm run docs:sidebar && vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "vitepress",
+    "documentation",
+    "help-center"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "vitepress": "^1.6.3",
+    "vue": "^3.5.13"
+  }
+}

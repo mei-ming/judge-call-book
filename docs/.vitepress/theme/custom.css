@@ -1,0 +1,38 @@
+/**
+ * Custom Theme Styles for Judge Call Book
+ */
+
+:root {
+  --vp-c-brand-1: #2563eb;
+  --vp-c-brand-2: #3b82f6;
+  --vp-c-brand-3: #60a5fa;
+  --vp-c-brand-soft: rgba(37, 99, 235, 0.14);
+}
+
+.dark {
+  --vp-c-brand-1: #3b82f6;
+  --vp-c-brand-2: #60a5fa;
+  --vp-c-brand-3: #93c5fd;
+  --vp-c-brand-soft: rgba(59, 130, 246, 0.16);
+}
+
+/* Video & Media Enhancements */
+.vp-doc video {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 1.5rem 0;
+  max-width: 100%;
+}
+
+.vp-doc img {
+  border-radius: 8px;
+  margin: 1.5rem auto;
+}
+
+/* Scribe & Iframe container */
+.vp-doc iframe {
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin: 1.5rem 0;
+}
