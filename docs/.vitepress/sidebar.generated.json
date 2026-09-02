@@ -5,30 +5,22 @@
       "link": "/features/"
     },
     {
-      "text": "桌次列表",
+      "text": "桌次管理",
       "collapsed": false,
       "items": [
         {
           "text": "桌次列表",
           "link": "/features/tables/"
-        },
-        {
-          "text": "Page2",
-          "link": "/features/tables/page2"
         }
       ]
     },
     {
-      "text": "罰則",
+      "text": "判罰系統",
       "collapsed": false,
       "items": [
         {
-          "text": "罰則",
+          "text": "判罰複製",
           "link": "/features/penalties/"
-        },
-        {
-          "text": "Page1",
-          "link": "/features/penalties/page1"
         }
       ]
     }
@@ -41,6 +33,14 @@
     {
       "text": "登入教學",
       "link": "/getting-started/login"
+    },
+    {
+      "text": "桌次狀態",
+      "link": "/getting-started/table"
+    },
+    {
+      "text": "判罰",
+      "link": "/getting-started/penalties"
     }
   ],
   "/troubleshooting/": [

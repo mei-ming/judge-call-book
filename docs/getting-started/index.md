@@ -26,3 +26,8 @@ End of Round
 
 <video controls playsinline preload="metadata" style="width: 100%; border-radius: 8px;" src="/media/videos/seat-inspection-full-v2.webm"></video>
 
+# 關於 Judge Call
+
+[https://judge-call.aquapr.net/](https://judge-call.aquapr.net/)
+
+用於輔助 EOR 流程及判罰記錄的工具。可以同步資料，桌次配對與玩家列表自動從配對表中撈取。

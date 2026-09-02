@@ -13,7 +13,7 @@ const SECTION_TITLES = {
   'guide': '使用指南',
   'faq': '常見問答',
   'tables': '桌次管理',
-  'penalties': '罰則系統'
+  'penalties': '判罰系統'
 };
 
 /**
@@ -104,7 +104,21 @@ export function generateSidebar() {
       continue;
     }
 
-    const title = frontmatter.title || extractFirstH1(content) || path.basename(filePath, '.md');
+    // Item text in sidebar (allows index_title / item_title to customize link text)
+    const itemText = frontmatter.index_title
+      || frontmatter.indexTitle
+      || frontmatter.item_title
+      || frontmatter.itemTitle
+      || frontmatter.nav_title
+      || frontmatter.navTitle
+      || frontmatter.link_text
+      || frontmatter.linkText
+      || frontmatter.sidebar_title
+      || frontmatter.sidebarTitle
+      || frontmatter.title
+      || extractFirstH1(content)
+      || path.basename(filePath, '.md');
+
     const order = typeof frontmatter.order === 'number' ? frontmatter.order : 9999;
     
     // Construct VitePress link (without .md, index becomes '/')
@@ -114,25 +128,13 @@ export function generateSidebar() {
     }
 
     const itemObj = {
-      text: title,
+      text: itemText,
       link: linkPath,
       order: order,
       filename: path.basename(filePath)
     };
 
-    // Check if file is in a sub-directory or has explicit frontmatter group
-    if (frontmatter.group) {
-      const groupKey = frontmatter.group;
-      if (!sectionData[sectionKey].subGroups[groupKey]) {
-        sectionData[sectionKey].subGroups[groupKey] = {
-          title: groupKey,
-          order: typeof frontmatter.group_order === 'number' ? frontmatter.group_order : 9999,
-          collapsed: frontmatter.collapsed !== undefined ? frontmatter.collapsed : false,
-          items: []
-        };
-      }
-      sectionData[sectionKey].subGroups[groupKey].items.push(itemObj);
-    } else if (pathParts.length > 2) {
+    if (pathParts.length > 2) {
       // It's in a subdirectory: docs/<section>/<subDir>/...
       const subDir = pathParts[1];
       if (!sectionData[sectionKey].subGroups[subDir]) {
@@ -146,20 +148,54 @@ export function generateSidebar() {
         };
       }
 
-      // If this file is index.md of the subDir, it can set the group's title and order
+      // If this file is index.md of the subDir, it can set the group's title, order, and collapsed state
       if (pathParts.length === 3 && pathParts[2] === 'index.md') {
-        if (frontmatter.title) {
+        const explicitGroupTitle = frontmatter.group_title
+          || frontmatter.groupTitle
+          || (typeof frontmatter.group === 'string' ? frontmatter.group : frontmatter.group?.title)
+          || frontmatter.menu_title
+          || frontmatter.menuTitle
+          || frontmatter.section_title
+          || frontmatter.sectionTitle;
+
+        if (explicitGroupTitle) {
+          sectionData[sectionKey].subGroups[subDir].title = explicitGroupTitle;
+        } else if (frontmatter.title) {
           sectionData[sectionKey].subGroups[subDir].title = frontmatter.title;
         }
-        if (typeof frontmatter.order === 'number') {
+
+        const explicitGroupOrder = typeof frontmatter.group_order === 'number'
+          ? frontmatter.group_order
+          : (typeof frontmatter.groupOrder === 'number' ? frontmatter.groupOrder : undefined);
+
+        if (explicitGroupOrder !== undefined) {
+          sectionData[sectionKey].subGroups[subDir].order = explicitGroupOrder;
+        } else if (typeof frontmatter.order === 'number') {
           sectionData[sectionKey].subGroups[subDir].order = frontmatter.order;
         }
-        if (frontmatter.collapsed !== undefined) {
-          sectionData[sectionKey].subGroups[subDir].collapsed = frontmatter.collapsed;
+
+        const collapsedVal = frontmatter.collapsed !== undefined
+          ? frontmatter.collapsed
+          : frontmatter.group_collapsed;
+
+        if (collapsedVal !== undefined) {
+          sectionData[sectionKey].subGroups[subDir].collapsed = collapsedVal;
         }
       }
 
       sectionData[sectionKey].subGroups[subDir].items.push(itemObj);
+    } else if (frontmatter.group) {
+      // Top-level file with explicit frontmatter group
+      const groupKey = typeof frontmatter.group === 'string' ? frontmatter.group : frontmatter.group.title;
+      if (!sectionData[sectionKey].subGroups[groupKey]) {
+        sectionData[sectionKey].subGroups[groupKey] = {
+          title: groupKey,
+          order: typeof frontmatter.group_order === 'number' ? frontmatter.group_order : 9999,
+          collapsed: frontmatter.collapsed !== undefined ? frontmatter.collapsed : false,
+          items: []
+        };
+      }
+      sectionData[sectionKey].subGroups[groupKey].items.push(itemObj);
     } else {
       // Top-level item within this section
       sectionData[sectionKey].rootItems.push(itemObj);
