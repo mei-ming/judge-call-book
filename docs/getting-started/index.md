@@ -22,7 +22,7 @@ End of Round
 
 3. 一直重複 2，直到所有桌次都結束。
 
-> ERO 需要保留人力處理 Judge Call
+> EOR 需要保留人力處理 Judge Call
 
 <video controls playsinline preload="metadata" style="width: 100%; border-radius: 8px;" src="/media/videos/seat-inspection-full-v2.webm"></video>
 

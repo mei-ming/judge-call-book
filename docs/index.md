@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "Judge Call Book"
   text: "EOR 工具教學與使用手冊"
-  tagline: "方便賽場 ERO 進行與判罰記錄"
+  tagline: "方便賽場 EOR 進行與判罰記錄"
   actions:
     - theme: brand
       text: 快速開始
